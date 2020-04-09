@@ -1,5 +1,7 @@
 # AWS CodeCommit based devops model
 
+[简体中文版本](README.zh-CN.md)
+
 AWS CodeCommit is a **managed**, **secure** and **git based** source code management service. AWS CodeCommit helps enterprise users to set up secure and managed SCM. Though it does not provide the social related features(such as forking and liking) in [Github][github] or [Gitlab][gitlab]. It can easily work like [Gerrit Code Review][gerrit] for team collobration in any size, which is thoroughly used by Android and the projects under Eclipse Foundation.
 
 This best practice model consists of below guidelines and workflows,
