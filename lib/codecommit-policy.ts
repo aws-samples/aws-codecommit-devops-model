@@ -10,8 +10,8 @@ export interface CodecommitCollaborationModelProps {
 
 export class CodecommitCollaborationModel extends cdk.Construct {
 
-    readonly codeCommitCollaboratorPolicy: iam.Policy;
-    readonly codeCommitAdminPolicy: iam.Policy;
+    readonly codeCommitCollaboratorPolicy: iam.ManagedPolicy;
+    readonly codeCommitAdminPolicy: iam.ManagedPolicy;
 
     constructor(scope: cdk.Construct, id: string, props: CodecommitCollaborationModelProps) {
         super(scope, id);
@@ -25,7 +25,7 @@ export class CodecommitCollaborationModel extends cdk.Construct {
             resources: ['*'],
         });
         // Code Collaborator Policy
-        this.codeCommitCollaboratorPolicy = new iam.Policy(this, `CodeCommitCollarator-${props.name}`, {
+        this.codeCommitCollaboratorPolicy = new iam.ManagedPolicy(this, `CodeCommitCollarator-${props.name}`, {
             statements: [
                 listAllPolicyStatement,
                 new iam.PolicyStatement({
@@ -75,7 +75,7 @@ export class CodecommitCollaborationModel extends cdk.Construct {
         });
 
         // Code Admin Policy
-        this.codeCommitAdminPolicy = new iam.Policy(this, `CodeCommitAdmin-${props.name}`, {
+        this.codeCommitAdminPolicy = new iam.ManagedPolicy(this, `CodeCommitAdmin-${props.name}`, {
             statements: [
                 listAllPolicyStatement,
                 new iam.PolicyStatement({

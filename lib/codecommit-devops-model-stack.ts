@@ -20,7 +20,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
 
     const repo1 = new codecommit.Repository(this, 'Repository1', {
       repositoryName: `${stack.stackName}-MyApp1`,
-      description: 'Repo fo App1.', // optional property
+      description: 'Repo for App1.', // optional property
     });
     cdk.Tag.add(repo1, 'app', 'my-app-1');
     cdk.Tag.add(repo1, 'cost-center', '12345');
@@ -28,7 +28,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
 
     const repo2 = new codecommit.Repository(this, 'Repository2', {
       repositoryName: `${stack.stackName}-MyApp2`,
-      description: 'Repo fo App2.', // optional property
+      description: 'Repo for App2.', // optional property
     });
     cdk.Tag.add(repo2, 'app', 'my-app-2');
     cdk.Tag.add(repo2, 'team', 'abc');
@@ -41,19 +41,21 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       }
     });
 
-    const repoAdmin = new iam.User(this, 'Repo1Admin', {
+    const repo1AdminRole = new iam.Role(this, 'Repo1AdminRole', {
+      assumedBy: new iam.AccountPrincipal(this.account),
+      managedPolicies: [codeCollaboratorModel.codeCommitAdminPolicy],
       path: '/codecommitmodel/',
     });
-    repoAdmin.attachInlinePolicy(codeCollaboratorModel.codeCommitAdminPolicy);
-    const repo1Collaborator = new iam.User(this, 'Repo1Collaborator', {
+    const repo1CollaboratorRole = new iam.Role(this, 'Repo1CollaboratorRole', {
+      assumedBy: new iam.AccountPrincipal(stack.account),
+      managedPolicies: [codeCollaboratorModel.codeCommitCollaboratorPolicy],
       path: '/codecommitmodel/',
     });
-    repo1Collaborator.attachInlinePolicy(codeCollaboratorModel.codeCommitCollaboratorPolicy);
-
+    
     // create a repo without tags either 'app' or 'team'
     const repo3 = new codecommit.Repository(this, 'Repository3', {
       repositoryName: `${stack.stackName}-MyApp3`,
-      description: 'Repo fo App3.',
+      description: 'Repo for App3.',
     });
 
     // Add PR build and trigger on PR created/updated
@@ -356,7 +358,13 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
           approvers: {
             numberOfApprovalsNeeded: 2,
             approvalPoolMembers: [ // optional
-              repoAdmin.userArn,
+              cdk.Arn.format({
+                service: 'sts',
+                region: '',
+                resource: 'assumed-role',
+                resourceName: `${repo1AdminRole.roleName}/*`,
+                sep: '/'
+              }, stack),
               cdk.Arn.format({
                 service: 'sts',
                 region: '',
@@ -391,15 +399,15 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       }
     });
 
-    new cdk.CfnOutput(this, 'IAMUser:RepoAdmin', {
-      value: `${repoAdmin.userName}`,
-      exportName: `${stack.stackName}-AdminUsername`,
-      description: 'admin of repo'
+    new cdk.CfnOutput(this, 'Repo1AdminRoleOutput', {
+      value: `${repo1AdminRole.roleArn}`,
+      exportName: `${stack.stackName}-Repo1AdminRole`,
+      description: 'admin role of repo1'
     });
-    new cdk.CfnOutput(this, 'IAMUser:RepoCollaborator', {
-      value: `${repo1Collaborator.userName}`,
-      exportName: `${stack.stackName}-CollaboratorUsername`,
-      description: 'collaborator of repo'
+    new cdk.CfnOutput(this, 'Repo1CollaboratorRoleOutput', {
+      value: `${repo1CollaboratorRole.roleArn}`,
+      exportName: `${stack.stackName}-Repo1CollaboratorRole`,
+      description: 'collaborator role of repo1'
     });
 
   }
