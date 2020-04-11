@@ -17,14 +17,26 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
 
     // The code that defines your stack goes here
     const stack = cdk.Stack.of(this);
+    const bizTags = [
+      {
+        name: 'app',
+        value: 'my-app-1',
+      },
+      {
+        name: 'cost-center',
+        value: '12345',
+      },
+      {
+        name: 'team',
+        value: 'abc',
+      }
+    ];
 
     const repo1 = new codecommit.Repository(this, 'Repository1', {
       repositoryName: `${stack.stackName}-MyApp1`,
       description: 'Repo for App1.', // optional property
     });
-    cdk.Tag.add(repo1, 'app', 'my-app-1');
-    cdk.Tag.add(repo1, 'cost-center', '12345');
-    cdk.Tag.add(repo1, 'team', 'abc');
+    bizTags.forEach(tag => { cdk.Tag.add(repo1, tag.name, tag.value )});
 
     const repo2 = new codecommit.Repository(this, 'Repository2', {
       repositoryName: `${stack.stackName}-MyApp2`,
@@ -140,6 +152,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       ),
       timeout: cdk.Duration.minutes(30),
     });
+    bizTags.forEach(tag => { cdk.Tag.add(prBuild, tag.name, tag.value )});
 
     const prRule = repo1.onPullRequestStateChange('PRBuild', {
       target: new targets.CodeBuildProject(prBuild, {
@@ -309,6 +322,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       branches: ['master'],
       target: new targets.CodeBuildProject(deploymentBuild),
     });
+    bizTags.forEach(tag => { cdk.Tag.add(deploymentBuild, tag.name, tag.value )});
     
     // create lambda based custom resource to create approval rule template
     const codecommitApprovalRulePolicy = new iam.PolicyStatement({

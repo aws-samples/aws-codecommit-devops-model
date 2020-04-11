@@ -21,13 +21,28 @@ export class CodecommitCollaborationModel extends cdk.Construct {
             actions: [
                 "codecommit:ListApprovalRuleTemplates",
                 "codecommit:ListRepositories",
+                'codebuild:ListProjects',
             ],
             resources: ['*'],
+        });
+        const codeBuildReadonlyPolicyStatement = new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: [
+                'codebuild:BatchGetBuilds',
+                'codebuild:BatchGetProjects',
+                'codebuild:ListBuildsForProject',
+                'codebuild:ListCuratedEnvironmentImages',
+                'codebuild:StartBuild',
+                'codebuild:StopBuild',
+            ],
+            resources: ['*'],
+            conditions: this.toTagCondition(props.tags),
         });
         // Code Collaborator Policy
         this.codeCommitCollaboratorPolicy = new iam.ManagedPolicy(this, `CodeCommitCollarator-${props.name}`, {
             statements: [
                 listAllPolicyStatement,
+                codeBuildReadonlyPolicyStatement,
                 new iam.PolicyStatement({
                     effect: iam.Effect.ALLOW,
                     actions: [
@@ -78,10 +93,10 @@ export class CodecommitCollaborationModel extends cdk.Construct {
         this.codeCommitAdminPolicy = new iam.ManagedPolicy(this, `CodeCommitAdmin-${props.name}`, {
             statements: [
                 listAllPolicyStatement,
+                codeBuildReadonlyPolicyStatement,
                 new iam.PolicyStatement({
                     effect: iam.Effect.ALLOW,
                     actions: [
-                        "codecommit:AssociateApprovalRuleTemplateWithRepository",
                         "codecommit:BatchGet*",
                         "codecommit:BatchDescribe*",
                         "codecommit:Create*",
