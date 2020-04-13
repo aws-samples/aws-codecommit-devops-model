@@ -7,6 +7,7 @@ import codebuild = require('@aws-cdk/aws-codebuild');
 import events = require('@aws-cdk/aws-events');
 import iam = require('@aws-cdk/aws-iam');
 import lambda = require('@aws-cdk/aws-lambda');
+import lambdaNodejs = require('@aws-cdk/aws-lambda-nodejs');
 import path = require('path');
 import targets = require('@aws-cdk/aws-events-targets')
 import { CodecommitCollaborationModel } from './codecommit-policy';
@@ -353,11 +354,13 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
       ]
     });
-    const approvalRuleTemplateProvider = new lambda.Function(this, `CodeCommitApprovalRuleTemplate`, {
+    const approvalRuleTemplateProvider = new lambdaNodejs.NodejsFunction(this, `CodeCommitApprovalRuleTemplate`, {
       role: codeCommitApprovalRuleTemplateRole,
       runtime: lambda.Runtime.NODEJS_12_X,
-      code: lambda.Code.fromAsset(path.join(__dirname, '../assets')),
-      handler: 'codecommit.approvalRuleTemplate',
+      entry: path.join(__dirname, '../assets/approval-rule-template/codecommit.ts'),
+      handler: 'approvalRuleTemplate',
+      minify: false,
+      sourceMaps: true,
       timeout: cdk.Duration.minutes(5),
     });
 
@@ -393,11 +396,13 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
     });
 
     // create lambda based custom resource to associate/disassociate approval rule with repos
-    const approvalRuleTemplateRepoAssociationProvider = new lambda.Function(this, `CodeCommitApprovalRuleTemplateRepoAssociation`, {
+    const approvalRuleTemplateRepoAssociationProvider = new lambdaNodejs.NodejsFunction(this, `CodeCommitApprovalRuleTemplateRepoAssociation`, {
       role: codeCommitApprovalRuleTemplateRole,
       runtime: lambda.Runtime.NODEJS_12_X,
-      code: lambda.Code.fromAsset(path.join(__dirname, '../assets')),
-      handler: 'codecommit.approvalRuleRepoAssociation',
+      entry: path.join(__dirname, '../assets/approval-rule-template/codecommit.ts'),
+      handler: 'approvalRuleRepoAssociation',
+      minify: false,
+      sourceMaps: true,
       timeout: cdk.Duration.minutes(5),
     });
 

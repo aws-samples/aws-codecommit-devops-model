@@ -28,7 +28,7 @@ This model also leverages the Infra as Code capability of AWS via [AWS CDK][cdk]
   
 ### Deploy it
 ```shell
-# build lambda function for cfn custom resource 'ApprovalRuleTemplate' and 'ApprovalRuleRepoAssociation', init cdk toolkit
+# install dependencies of lambda functions, init cdk toolkit
 npm run init
 
 # deploy

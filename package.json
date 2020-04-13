@@ -1,6 +1,7 @@
 {
   "name": "aws-codecommit-devops-model",
   "version": "1.0.0",
+  "description": "AWS CodeCommit based devops practice at scale.",
   "bin": {
     "codecommit-devops-model": "bin/codecommit-devops-model.js"
   },
@@ -9,7 +10,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "init": "cd assets/ && npm i && npm run build && cd ../ && ./node_modules/aws-cdk/bin/cdk bootstrap",
+    "init": "npm i --prefix assets/approval-rule-template && npm i && ./node_modules/aws-cdk/bin/cdk bootstrap",
     "deploy": "./node_modules/aws-cdk/bin/cdk deploy",
     "cleanup": "./node_modules/aws-cdk/bin/cdk destroy"
   },
@@ -28,7 +29,9 @@
     "@aws-cdk/aws-codecommit": "^1.32.2",
     "@aws-cdk/aws-events-targets": "^1.32.2",
     "@aws-cdk/aws-iam": "^1.32.2",
+    "@aws-cdk/aws-lambda-nodejs": "^1.32.2",
     "@aws-cdk/core": "1.32.2",
+    "parcel-bundler": "^1.12.4",
     "source-map-support": "^0.5.16"
   },
   "license": "MIT-0"

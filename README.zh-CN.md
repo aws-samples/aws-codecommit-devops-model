@@ -31,7 +31,7 @@ AWS CodeCommit是一个**托管的**、**安全的**、**Git**源代码管理服
   
 ### 部署步骤
 ```shell
-# 为首次使用 AWS CDK，初始化 cdk toolkit。编译 CloudFormation 自定义资源使用的 Lambda 函数
+# 安装项目部署依赖及 Lambda 函数依赖。为首次使用 AWS CDK，初始化 cdk toolkit。
 npm run init
 
 # 部署
