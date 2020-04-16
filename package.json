@@ -10,7 +10,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "init": "npm i --prefix assets/approval-rule-template && npm i && ./node_modules/aws-cdk/bin/cdk bootstrap",
+    "init": "npm i --prefix assets/approval-rule-template && npm i --prefix assets/pr-build-events && npm i && ./node_modules/aws-cdk/bin/cdk bootstrap",
     "deploy": "./node_modules/aws-cdk/bin/cdk deploy",
     "cleanup": "./node_modules/aws-cdk/bin/cdk destroy"
   },

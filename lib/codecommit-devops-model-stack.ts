@@ -72,26 +72,29 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
     });
 
     // Add PR build and trigger on PR created/updated
-    const codecommitPolicy = new iam.PolicyStatement({
+    const codeBuildPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
-        "codecommit:PostCommentForPullRequest",
-        "codecommit:UpdatePullRequestApprovalState",
+        "codebuild:BatchGetReports",
+        "codebuild:DescribeTestCases",
+        "codebuild:ListReportGroups",
+        "codebuild:CreateReportGroup",
+        "codebuild:CreateReport",
+        "codebuild:BatchPutTestCases",
+        "codebuild:UpdateReport",
       ],
-      resources: [
-        repo1.repositoryArn
-      ],
+      resources: [ '*' ]
     });
-    const buildPRRole = new iam.Role(this, `CodeCommit-Repo1-PR-Build-Role`, {
+    const prBuildRole = new iam.Role(this, `CodeCommit-Repo1-PR-Build-Role`, {
       assumedBy: new iam.ServicePrincipal("codebuild.amazonaws.com"),
       inlinePolicies: {
-        codecommit: new iam.PolicyDocument({
-          statements: [codecommitPolicy]
+        codebuild: new iam.PolicyDocument({
+          statements: [codeBuildPolicy]
         }),
       }
     });
     const prBuild = new codebuild.Project(this, `Repo1-PRBuild`, {
-      role: buildPRRole,
+      role: prBuildRole,
       buildSpec: codebuild.BuildSpec.fromObject({
         version: '0.2',
         env: {
@@ -103,18 +106,10 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
             'runtime-versions': {
               nodejs: '12',
             },
-            commands: [
-              'pip install --upgrade awscli'
-            ]
           },
           pre_build: {
             commands: [
               `echo Build PR $pullRequestId of repo $repositoryName...`,
-              `aws codecommit update-pull-request-approval-state --pull-request-id $pullRequestId \
-                  --revision-id $revisionId --approval-state "REVOKE"`,
-              `aws codecommit post-comment-for-pull-request --pull-request-id $pullRequestId \
-                  --repository-name $repositoryName --before-commit-id $destinationCommit \
-                  --after-commit-id $sourceCommit --content "Started CI build $CODEBUILD_BUILD_ID for this PR."`
             ]
           },
           build: {
@@ -122,23 +117,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
               'echo Source repo $CODEBUILD_SOURCE_REPO_URL with version $CODEBUILD_SOURCE_VERSION',
               'echo here is building task',
             ],
-            finally: [
-              `if [ $CODEBUILD_BUILD_SUCCEEDING == "0" ]; then \
-                  aws codecommit post-comment-for-pull-request --pull-request-id $pullRequestId \
-                  --repository-name $repositoryName --before-commit-id $destinationCommit \
-                  --after-commit-id $sourceCommit --content "CI build at $CODEBUILD_BUILD_ID failed."; \
-                  else aws codecommit post-comment-for-pull-request --pull-request-id $pullRequestId \
-                  --repository-name $repositoryName --before-commit-id $destinationCommit \
-                  --after-commit-id $sourceCommit --content "CI build at $CODEBUILD_BUILD_ID successed."; fi`
-            ]
           },
-          post_build: {
-            commands: [
-              `if [ $CODEBUILD_BUILD_SUCCEEDING == "1" ]; then \
-                  aws codecommit update-pull-request-approval-state --pull-request-id $pullRequestId \
-                  --revision-id $revisionId --approval-state "APPROVE"; fi`
-            ]
-          }
         },
       }),
       environment: {
@@ -155,6 +134,48 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
     });
     bizTags.forEach(tag => { cdk.Tag.add(prBuild, tag.name, tag.value )});
 
+    // create lambda to listen on the state changed of PR Build
+    const codecommitPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        "codecommit:PostCommentForPullRequest",
+        "codecommit:UpdatePullRequestApprovalState",
+      ],
+      resources: [
+        repo1.repositoryArn
+      ],
+    });
+    const prBuildEventLambaRole = new iam.Role(this, `CodeCommitRepo1PRBuildEventLambdaRole`, {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+      inlinePolicies: {
+        codecommit: new iam.PolicyDocument({
+          statements: [codecommitPolicy]
+        }),
+      },
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+      ]
+    });
+    const prBuildEventHandler = new lambdaNodejs.NodejsFunction(this, `CodeCommitRepo1PRBuildEventHandler`, {
+      role: prBuildEventLambaRole,
+      runtime: lambda.Runtime.NODEJS_12_X,
+      entry: path.join(__dirname, '../assets/pr-build-events/handler.ts'),
+      handler: 'prBuildStateChanged',
+      minify: false,
+      sourceMaps: true,
+      timeout: cdk.Duration.minutes(1),
+    });
+    prBuild.onBuildStarted(`Repo1PRBuildStarted`, {
+      target: new targets.LambdaFunction(prBuildEventHandler),
+    });
+    prBuild.onBuildSucceeded(`Repo1PRBuildSuccessed`, {
+      target: new targets.LambdaFunction(prBuildEventHandler),
+    });
+    prBuild.onBuildFailed(`Repo1PRBuildFailed`, {
+      target: new targets.LambdaFunction(prBuildEventHandler),
+    });
+
+    // create cloudwatch event to trigger pr build when pr is create or the source branch is updated
     const prRule = repo1.onPullRequestStateChange('PRBuild', {
       target: new targets.CodeBuildProject(prBuild, {
         event: events.RuleTargetInput.fromObject({
@@ -386,7 +407,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
                 service: 'sts',
                 region: '',
                 resource: 'assumed-role',
-                resourceName: `${buildPRRole.roleName}/*`,
+                resourceName: `${prBuildEventLambaRole.roleName}/*`,
                 sep: '/'
               }, stack)
             ]
