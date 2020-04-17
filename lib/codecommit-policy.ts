@@ -16,6 +16,13 @@ export class CodecommitCollaborationModel extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: CodecommitCollaborationModelProps) {
         super(scope, id);
 
+        const iamPolicyStatement = new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: [
+                "iam:PassRole",
+            ],
+            resources: ['*'],
+        });
         const listAllPolicyStatement = new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             actions: [
@@ -41,6 +48,7 @@ export class CodecommitCollaborationModel extends cdk.Construct {
         // Code Collaborator Policy
         this.codeCommitCollaboratorPolicy = new iam.ManagedPolicy(this, `CodeCommitCollarator-${props.name}`, {
             statements: [
+                iamPolicyStatement,
                 listAllPolicyStatement,
                 codeBuildReadonlyPolicyStatement,
                 new iam.PolicyStatement({
@@ -92,6 +100,7 @@ export class CodecommitCollaborationModel extends cdk.Construct {
         // Code Admin Policy
         this.codeCommitAdminPolicy = new iam.ManagedPolicy(this, `CodeCommitAdmin-${props.name}`, {
             statements: [
+                iamPolicyStatement,
                 listAllPolicyStatement,
                 codeBuildReadonlyPolicyStatement,
                 new iam.PolicyStatement({
