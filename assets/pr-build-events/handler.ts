@@ -84,15 +84,23 @@ export const prBuildStateChanged : CodeBuildStateChangedHandler = async (event, 
     const repositoryName = findEnvironmentByName(envsOfBuild, 'repositoryName').value;
     const beforeCommitId = findEnvironmentByName(envsOfBuild, 'sourceCommit').value;
     const afterCommitId = findEnvironmentByName(envsOfBuild, 'destinationCommit').value;
+    const revisionId = findEnvironmentByName(envsOfBuild, 'revisionId').value;
     switch (event.detail["build-status"]) {
         case 'IN_PROGRESS':
-            await codecommit.postCommentForPullRequest({
+            const startActions = [];
+            startActions.push(codecommit.postCommentForPullRequest({
                 pullRequestId,
                 repositoryName,
                 beforeCommitId,
                 afterCommitId,
                 content: `Started CI build ${event.detail["build-id"]} on commit '${afterCommitId}' for this PR.`,
-            }).promise();
+            }).promise());
+            startActions.push(codecommit.updatePullRequestApprovalState({
+                pullRequestId,
+                revisionId,
+                approvalState: 'REVOKE',
+            }).promise());
+            await Promise.all(startActions);
             break;
         case 'SUCCEEDED':
             const actions = [];
@@ -105,7 +113,7 @@ export const prBuildStateChanged : CodeBuildStateChangedHandler = async (event, 
             }).promise());
             actions.push(codecommit.updatePullRequestApprovalState({
                 pullRequestId,
-                revisionId: findEnvironmentByName(envsOfBuild, 'revisionId').value,
+                revisionId,
                 approvalState: 'APPROVE',
             }).promise());
             await Promise.all(actions);
