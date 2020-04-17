@@ -18,7 +18,7 @@ AWS CodeCommit是一个**托管的**、**安全的**、**Git**源代码管理服
 
 完整的工作流程图如下，
 
-![基于 AWS CodeCommit 的 Devops 最佳实践](arch.png)
+![基于 AWS CodeCommit 的 Devops 最佳实践](arch.zh-CN.png)
 
 这个最佳实践通过[AWS CDK][cdk]/[CloudFormation][cloudformation]贯穿了基础架构即代码的理念，即使企业有成百数千的代码仓库也可以按最佳实践的方式统一管理。
 
