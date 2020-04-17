@@ -1,5 +1,7 @@
 # AWS CodeCommit based devops model
 
+> It's a branch using [AWS Toolkit Jetbrains](https://github.com/aws/aws-toolkit-jetbrains) to demonstrate the devops workflow.
+
 [简体中文版本](README.zh-CN.md)
 
 > Now this best practice model works on both AWS Global and [AWS China regions][codecommit-china-ga-news].

@@ -1,5 +1,7 @@
 # 基于 AWS CodeCommit 的 Devops 最佳实践
 
+> 本分支使用[AWS Toolkit Jetbrains](https://github.com/aws/aws-toolkit-jetbrains)演示devops开发流程。
+
 [English version](README.md)
 
 > 本文介绍的最佳实践可应用到AWS全球区和[AWS中国区域][codecommit-china-ga-news]。详细的实践步骤请参考[博客][cn-blog]。
