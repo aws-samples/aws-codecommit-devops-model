@@ -2,6 +2,8 @@
 
 [简体中文版本](README.zh-CN.md)
 
+> Now this best practice model works on both AWS Global and [AWS China regions][codecommit-china-ga-news].
+
 AWS CodeCommit is a **managed**, **secure** and **git based** source code management service. AWS CodeCommit helps enterprise users to set up secure and managed SCM. Though it does not provide the social related features(such as forking and liking) in [Github][github] or [Gitlab][gitlab]. It can easily work like [Gerrit Code Review][gerrit] for team collobration in any size, which is thoroughly used by Android and the projects under Eclipse Foundation.
 
 This best practice model consists of below guidelines and workflows,
@@ -50,3 +52,4 @@ This sample code is made available under the MIT-0 license. See the LICENSE file
 [gerrit]: https://www.gerritcodereview.com/
 [cdk]: https://aws.amazon.com/cdk/
 [cloudformation]: https://aws.amazon.com/cloudformation/
+[codecommit-china-ga-news]: https://www.amazonaws.cn/en/new/2020/aws-codecommit-available-aws-china-beijing-sinnet-ningxia-nwcd/
