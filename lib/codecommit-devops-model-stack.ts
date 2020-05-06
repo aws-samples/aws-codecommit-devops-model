@@ -167,7 +167,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
         codebuild.LocalCacheMode.DOCKER_LAYER,
         codebuild.LocalCacheMode.CUSTOM
       ),
-      timeout: cdk.Duration.minutes(30),
+      timeout: cdk.Duration.minutes(180),
     });
     bizTags.forEach(tag => { cdk.Tag.add(prBuild, tag.name, tag.value )});
 
@@ -376,7 +376,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
         codebuild.LocalCacheMode.DOCKER_LAYER,
         codebuild.LocalCacheMode.CUSTOM
       ),
-      timeout: cdk.Duration.minutes(30),
+      timeout: cdk.Duration.minutes(180),
     });
     repo1.onCommit('CommitOnMaster', {
       branches: ['master'],
