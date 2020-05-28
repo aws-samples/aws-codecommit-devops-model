@@ -121,7 +121,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
         },
       }),
       environment: {
-        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_2,
+        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_3,
         computeType: codebuild.ComputeType.SMALL,
       },
       source: codebuild.Source.codeCommit({ repository: repo1 }),
@@ -330,6 +330,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
         },
       }),
       environment: {
+        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_3,
         computeType: codebuild.ComputeType.SMALL,
       },
       source: codebuild.Source.codeCommit({ repository: repo1 }),
