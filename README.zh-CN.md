@@ -2,7 +2,7 @@
 
 [English version](README.md)
 
-> 本文介绍的最佳实践可应用到AWS全球区和[AWS中国区域][codecommit-china-ga-news].
+> 本文介绍的最佳实践可应用到AWS全球区和[AWS中国区域][codecommit-china-ga-news]。详细的实践步骤请参考[博客][cn-blog]。
 
 AWS CodeCommit是一个**托管的**、**安全的**、**Git**源代码管理服务。AWS CodeCommit主要针对企业内部代码协作，所以他并没有像[Github][github]或者[Gitlab][gitlab]一样实现一些社交相关的功能，比如fork和喜欢等。[Gerrit Code Review][gerrit]是一款成熟且被Andorid和Eclipse基金会项目广泛使用的代码协作工具，AWS CodeCommit也很容易借鉴Gerrit的思路用于各种开发团队的协作。
 
@@ -56,3 +56,4 @@ This sample code is made available under the MIT-0 license. See the LICENSE file
 [cdk]: https://aws.amazon.com/cdk/
 [cloudformation]: https://aws.amazon.com/cloudformation/
 [codecommit-china-ga-news]: https://www.amazonaws.cn/new/2020/aws-codecommit-available-aws-china-beijing-sinnet-ningxia-nwcd/?nc1=h_ls
+[cn-blog]: https://aws.amazon.com/cn/blogs/china/scalable-agile-development-practices-based-on-aws-codecommit/
