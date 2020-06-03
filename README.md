@@ -26,9 +26,11 @@ This model also leverages the Infra as Code capability of AWS via [AWS CDK][cdk]
 ### Prerequisites
 
 - Install Node LTS(such as 12.x)
+- Install Docker
 - Configure your AWS account for [awscli](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html)
   
 ### Deploy it
+
 ```shell
 # install dependencies of lambda functions, init cdk toolkit
 npm run init
@@ -38,6 +40,7 @@ npm run deploy
 ```
 
 ### Cleanup
+
 ```shell
 npm run cleanup
 ```
