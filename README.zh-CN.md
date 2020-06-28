@@ -29,11 +29,12 @@ AWS CodeCommit是一个**托管的**、**安全的**、**Git**源代码管理服
 ### 准备条件
 
 - 安装 Node LTS 版本(例如 12.x)
+- 安装 Docker Engine(用于部署前编译Typescript所写的Lambda代码)
 - 为 [awscli](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html) 配置你的 AWS 账户
   
 ### 部署步骤
 ```shell
-# 安装项目部署依赖及 Lambda 函数依赖。为首次使用 AWS CDK，初始化 cdk toolkit。
+# 安装项目部署依赖及 Lambda 函数依赖。如首次使用 AWS CDK，初始化 cdk toolkit。
 npm run init
 
 # 部署
