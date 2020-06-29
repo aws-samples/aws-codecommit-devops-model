@@ -94,72 +94,17 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       }
     });
 
-    const supportWindows2016 = stack.region in [''] ? true : false;
     const prBuild = new codebuild.Project(this, `Repo1-PRBuild`, {
       role: prBuildRole,
-      buildSpec: supportWindows2016 ? codebuild.BuildSpec.fromSourceFilename('buildspec/linuxTests.yml') :
-        codebuild.BuildSpec.fromObject({
-          version: '0.2',
-          cache: {
-            paths: [ 
-              '/root/.gradle/caches/**/*',
-              '/root/.gradle/wrapper/**/*'
-            ]
-          },
-          env: {
-            variables: {
-              CI: true,
-              LOCAL_ENV_RUN: true
-            },
-          },
-          phases: {
-            install: {
-              'runtime-versions': {
-                java: 'openjdk11',
-                dotnet: '3.0'
-              },
-              commands: [
-                'apt update',
-                'apt install -y mono-complete'
-              ]
-            },
-            build: {
-              commands: [
-                'chmod +x gradlew',
-                './gradlew check coverageReport --info --full-stacktrace --console plain',
-                'VCS_COMMIT_ID="${CODEBUILD_RESOLVED_SOURCE_VERSION}"',
-                "CI_BUILD_URL=$(echo $CODEBUILD_BUILD_URL | sed 's/#/%23/g')",
-                'CI_BUILD_ID="${CODEBUILD_BUILD_ID}"',
-                'test -n "$CODE_COV_TOKEN" && curl -s https://codecov.io/bash > codecov.sh || true',
-                'test -n "$CODE_COV_TOKEN" && bash ./codecov.sh -t $CODE_COV_TOKEN -F unittest || true',
-              ],
-            },
-            post_build: {
-              commands: [
-                'TEST_ARTIFACTS="/tmp/testArtifacts"',
-                'mkdir -p $TEST_ARTIFACTS/test-reports',
-                "rsync -rmq --include='*/' --include '**/build/idea-sandbox/system*/log/**' --exclude='*' . $TEST_ARTIFACTS/ || true",
-                "rsync -rmq --include='*/' --include '**/build/reports/**' --exclude='*' . $TEST_ARTIFACTS/ || true",
-                "rsync -rmq --include='*/' --include '**/test-results/**/*.xml' --exclude='*' . $TEST_ARTIFACTS/test-reports || true",
-              ]
-            },
-          },
-          reports: {
-            'unit-test': {
-              files: [ "**/*" ],
-              'base-directory': '/tmp/testArtifacts/test-reports',
-              'discard-paths': 'yes'
-            }
-          },
-          artifacts: {
-            files: [ "**/*" ],
-            'base-directory': '/tmp/testArtifacts'
-          }
-        }),
+      buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec/linuxTests.yml'),
       environment: {
-        buildImage: supportWindows2016 ? codebuild.WindowsBuildImage.WIN_SERVER_CORE_2016_BASE 
-          : codebuild.LinuxBuildImage.STANDARD_3_0,
+        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
         computeType: codebuild.ComputeType.LARGE,
+        environmentVariables: {
+          ORG_GRADLE_PROJECT_skipRider: {
+            value: 'true',
+          },
+        },
       },
       source: codebuild.Source.codeCommit({ repository: repo1 }),
       cache: codebuild.Cache.local(
