@@ -8,6 +8,9 @@ jspm_packages
 # Webpack directories
 .webpack
 
+# parcel cache
+.parcel-cache/
+
 # output
 *.js
 lib/

@@ -1,6 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import CodeCommit = require('aws-sdk/clients/codecommit');
+import * as CodeCommit from 'aws-sdk/clients/codecommit';
 import { Handler, ScheduledEvent } from 'aws-lambda';
 
 export type CodeBuildStateChangedHandler = Handler<CodeBuildStateChangedEvent, void>;
