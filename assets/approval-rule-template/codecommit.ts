@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 import { CloudFormationCustomResourceHandler, CloudFormationCustomResourceUpdateEvent, CloudFormationCustomResourceDeleteEvent } from 'aws-lambda';
-import CodeCommit = require('aws-sdk/clients/codecommit');
+import * as CodeCommit from 'aws-sdk/clients/codecommit';
 const cfnCR = require('cfn-custom-resource');
 const { configure, sendResponse, LOG_VERBOSE, SUCCESS, FAILED } = cfnCR;
 const equal = require('deep-equal');
