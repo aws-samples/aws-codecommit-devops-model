@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as CodeCommit from 'aws-sdk/clients/codecommit';
-import { Handler, ScheduledEvent } from 'aws-lambda';
+import { CodeCommit } from 'aws-sdk';
+import { Handler, EventBridgeEvent } from 'aws-lambda';
 
 export type CodeBuildStateChangedHandler = Handler<CodeBuildStateChangedEvent, void>;
 
@@ -20,8 +20,7 @@ export interface BuildEnvironment {
     value: string;
 }
 
-export interface CodeBuildStateChangedEvent extends ScheduledEvent {
-    'detail-type': "CodeBuild Build State Change",
+export interface CodeBuildStateChangedEvent extends EventBridgeEvent<'CodeBuild Build State Change', any> {
     source: 'aws.codebuild',
     detail: {
         'build-status': string;
