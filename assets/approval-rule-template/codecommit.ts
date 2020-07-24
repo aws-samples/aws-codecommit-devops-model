@@ -1,12 +1,14 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 import { CloudFormationCustomResourceHandler, CloudFormationCustomResourceUpdateEvent, CloudFormationCustomResourceDeleteEvent } from 'aws-lambda';
-import * as CodeCommit from 'aws-sdk/clients/codecommit';
+import { CodeCommit } from 'aws-sdk';
 const cfnCR = require('cfn-custom-resource');
 const { configure, sendResponse, LOG_VERBOSE, SUCCESS, FAILED } = cfnCR;
 const equal = require('deep-equal');
 
 configure({ logLevel: LOG_VERBOSE });
+
+const codecommit = new CodeCommit();
 
 function buildTemplateContent(props: {
     ServiceToken: string;
@@ -27,7 +29,6 @@ function buildTemplateContent(props: {
 
 export const approvalRuleTemplate: CloudFormationCustomResourceHandler = async (event, _context) => {
     console.info(`Receiving ApprovalRuleEvent of CodeCommit ${JSON.stringify(event, null, 2)}`);
-    const codecommit = new CodeCommit();
     var responseData: any;
     var result = SUCCESS;  
     var reason: any = '';
@@ -96,7 +97,6 @@ export const approvalRuleTemplate: CloudFormationCustomResourceHandler = async (
 
 export const approvalRuleRepoAssociation: CloudFormationCustomResourceHandler = async (event, _context) => {
     console.info(`Receiving ApprovalRuleAssociationEvent of CodeCommit ${JSON.stringify(event, null, 2)}`);
-    const codecommit = new CodeCommit();
     var responseData: any;
     var result = SUCCESS;  
     var reason: any = '';
