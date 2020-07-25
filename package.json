@@ -22,7 +22,8 @@
     "jest": "^25.5.4",
     "ts-jest": "^25.5.1",
     "ts-node": "^8.10.2",
-    "typescript": "~3.7.2"
+    "typescript": "~3.7.2",
+    "lodash": "^4.17.19"
   },
   "dependencies": {
     "@aws-cdk/aws-codebuild": "^1.54.0",
