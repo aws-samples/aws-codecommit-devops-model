@@ -96,7 +96,51 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
 
     const prBuild = new codebuild.Project(this, `Repo1-PRBuild`, {
       role: prBuildRole,
-      buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec/linuxTests.yml'),
+      // buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec/linuxTests.yml'),
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        cache: {
+          paths: [
+            '/root/.gradle/caches/**/*',
+            '/root/.gradle/wrapper/**/*',
+          ],
+        },
+        env:{
+          variables: {
+            CI: true,
+            LOCAL_ENV_RUN: true
+          }
+        },
+        phases: {
+          install: {
+            'runtime-versions': {
+              java: 'corretto11',
+              dotnet: '3.1',
+            }
+          },
+          build: {
+            commands: [
+              'chmod +x gradlew',
+              './gradlew :jetbrains-core:buildPlugin',
+            ],
+          },
+        },
+        artifacts: {
+          files: [
+            '**/*',
+          ],
+          'base-directory': '/tmp/testArtifacts',
+          'secondary-artifacts': {
+            plugin: {
+              files: [
+                '/tmp/buildArtifacts/*',
+              ],
+              'discard-paths': 'yes',
+              name: 'plugin.zip',
+            }
+          }
+        },
+      }),
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
         computeType: codebuild.ComputeType.LARGE,
