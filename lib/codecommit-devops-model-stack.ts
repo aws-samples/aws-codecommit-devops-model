@@ -161,9 +161,11 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_12_X,
       entry: path.join(__dirname, '../assets/pr-build-events/handler.ts'),
       handler: 'prBuildStateChanged',
-      minify: false,
-      sourceMaps: true,
       timeout: cdk.Duration.minutes(1),
+      bundling: {
+        sourceMap: true,
+        minify: false,
+      },
     });
     prBuild.onBuildStarted(`Repo1PRBuildStarted`, {
       target: new targets.LambdaFunction(prBuildEventHandler),
@@ -381,9 +383,11 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_12_X,
       entry: path.join(__dirname, '../assets/approval-rule-template/codecommit.ts'),
       handler: 'approvalRuleTemplate',
-      minify: false,
-      sourceMaps: true,
       timeout: cdk.Duration.minutes(5),
+      bundling: {
+        sourceMap: true,
+        minify: false,
+      },
     });
 
     const approvalRuleTemplaate = new cloudformation.CustomResource(this, 'CustomResource-CodeCommit-ApprovalRuleTemplate', {
@@ -423,9 +427,11 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_12_X,
       entry: path.join(__dirname, '../assets/approval-rule-template/codecommit.ts'),
       handler: 'approvalRuleRepoAssociation',
-      minify: false,
-      sourceMaps: true,
       timeout: cdk.Duration.minutes(5),
+      bundling: {
+        sourceMap: true,
+        minify: false,
+      },
     });
 
     new cloudformation.CustomResource(this, 'CustomResource-CodeCommit-ApprovalRuleTemplate-Repos-Association', {
