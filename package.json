@@ -10,30 +10,36 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "init": "npm i --prefix assets/approval-rule-template && npm i --prefix assets/pr-build-events && npm i && npx cdk bootstrap",
+    "init": "npm i && npx cdk bootstrap",
     "deploy": "npx cdk deploy",
     "cleanup": "npx cdk destroy"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.80.0",
-    "@types/jest": "^26.0.19",
+    "@aws-cdk/assert": "1.123.0",
+    "@types/jest": "^26.0.24",
     "@types/node": "14.14.16",
-    "aws-cdk": "1.80.0",
+    "aws-cdk": "1.123.0",
     "jest": "^26.6.3",
     "lodash": "^4.17.21",
-    "node-notifier": ">=8.0.1",
-    "ts-jest": "^26.4.4",
+    "node-notifier": "^10.0.0",
+    "ts-jest": "^26.5.6",
     "ts-node": "^9.1.1",
-    "typescript": "~4.1.3"
+    "typescript": "^4.1.6",
+    "set-value": ">=4.0.1",
+    "@types/aws-lambda": "^8.10.83",
+    "@types/deep-equal": "^1.0.1"
   },
   "dependencies": {
-    "@aws-cdk/aws-codebuild": "^1.80.0",
-    "@aws-cdk/aws-codecommit": "^1.80.0",
-    "@aws-cdk/aws-events-targets": "^1.80.0",
-    "@aws-cdk/aws-iam": "^1.80.0",
-    "@aws-cdk/aws-lambda-nodejs": "^1.80.0",
-    "@aws-cdk/core": "1.80.0",
-    "source-map-support": "^0.5.19"
+    "@aws-cdk/aws-codebuild": "^1.123.0",
+    "@aws-cdk/aws-codecommit": "^1.123.0",
+    "@aws-cdk/aws-events-targets": "^1.123.0",
+    "@aws-cdk/aws-iam": "^1.123.0",
+    "@aws-cdk/aws-lambda-nodejs": "^1.123.0",
+    "@aws-cdk/core": "1.123.0",
+    "source-map-support": "^0.5.20",
+    "aws-sdk": "^2.991.0",
+    "cfn-custom-resource": "^5.0.14",
+    "deep-equal": "^2.0.5"
   },
   "license": "MIT-0"
 }
