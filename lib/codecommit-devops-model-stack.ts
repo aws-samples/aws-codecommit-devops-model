@@ -158,7 +158,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
     });
     const prBuildEventHandler = new lambdaNodejs.NodejsFunction(this, `CodeCommitRepo1PRBuildEventHandler`, {
       role: prBuildEventLambaRole,
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_14_X,
       entry: path.join(__dirname, '../assets/pr-build-events/handler.ts'),
       handler: 'prBuildStateChanged',
       timeout: cdk.Duration.minutes(1),
@@ -380,7 +380,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
     });
     const approvalRuleTemplateProvider = new lambdaNodejs.NodejsFunction(this, `CodeCommitApprovalRuleTemplate`, {
       role: codeCommitApprovalRuleTemplateRole,
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_14_X,
       entry: path.join(__dirname, '../assets/approval-rule-template/codecommit.ts'),
       handler: 'approvalRuleTemplate',
       timeout: cdk.Duration.minutes(5),
