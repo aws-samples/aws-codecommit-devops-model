@@ -87,10 +87,12 @@ export const approvalRuleTemplate: CloudFormationCustomResourceHandler = async (
                 break;
         }
     } catch (err) {
-        console.error(`Failed to create approval rule template due to ${err}.`);
-        responseData = err.message;
-        result = FAILED;
-        reason = err.message;
+        if (err instanceof Error) {
+            console.error(`Failed to create approval rule template due to ${err}.`);
+            responseData = err.message;
+            result = FAILED;
+            reason = err.message;
+        }
     }
     return await sendResponse({ Status: result, Reason: reason, PhysicalResourceId: (resourceId ? resourceId : _context.logStreamName), Data: responseData }, event);
 }
@@ -163,10 +165,12 @@ export const approvalRuleRepoAssociation: CloudFormationCustomResourceHandler = 
                 break;
         }
     } catch (err) {
-        console.error(`Failed to associate/disassociate approval rule template with repos due to ${err}.`);
-        responseData = err.message;
-        result = FAILED;
-        reason = err.message;
+        if (err instanceof Error) {
+            console.error(`Failed to associate/disassociate approval rule template with repos due to ${err}.`);
+            responseData = err.message;
+            result = FAILED;
+            reason = err.message;
+        }
     }
     return await sendResponse({ Status: result, Reason: reason, PhysicalResourceId: (resourceId ? resourceId : _context.logStreamName), Data: responseData }, event);
 }
