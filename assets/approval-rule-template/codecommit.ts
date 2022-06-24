@@ -1,12 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import { CloudFormationCustomResourceHandler, CloudFormationCustomResourceUpdateEvent, CloudFormationCustomResourceDeleteEvent } from 'aws-lambda';
+import { CloudFormationCustomResourceUpdateEvent, CloudFormationCustomResourceDeleteEvent } from 'aws-lambda';
 import { CodeCommit } from 'aws-sdk';
-const cfnCR = require('cfn-custom-resource');
-const { configure, sendResponse, LOG_VERBOSE, SUCCESS, FAILED } = cfnCR;
 const equal = require('deep-equal');
-
-configure({ logLevel: LOG_VERBOSE });
 
 const codecommit = new CodeCommit();
 
@@ -27,11 +23,10 @@ function buildTemplateContent(props: {
         return JSON.stringify(template, null, 2);
 }
 
-export const approvalRuleTemplate: CloudFormationCustomResourceHandler = async (event, _context) => {
+export const approvalRuleTemplate: AWSCDKAsyncCustomResource.OnEventHandler =
+  async (event: AWSCDKAsyncCustomResource.OnEventRequest) : Promise<AWSCDKAsyncCustomResource.OnEventResponse> => {
     console.info(`Receiving ApprovalRuleEvent of CodeCommit ${JSON.stringify(event, null, 2)}`);
     var responseData: any;
-    var result = SUCCESS;  
-    var reason: any = '';
     var resourceId: string | undefined = undefined;
     try {
         switch (event.RequestType) {
@@ -90,18 +85,19 @@ export const approvalRuleTemplate: CloudFormationCustomResourceHandler = async (
         if (err instanceof Error) {
             console.error(`Failed to create approval rule template due to ${err}.`);
             responseData = err.message;
-            result = FAILED;
-            reason = err.message;
         }
     }
-    return await sendResponse({ Status: result, Reason: reason, PhysicalResourceId: (resourceId ? resourceId : _context.logStreamName), Data: responseData }, event);
+    
+    return {
+      PhysicalResourceId: resourceId,
+      Data: responseData,
+    };
 }
 
-export const approvalRuleRepoAssociation: CloudFormationCustomResourceHandler = async (event, _context) => {
+export const approvalRuleRepoAssociation: AWSCDKAsyncCustomResource.OnEventHandler =
+  async (event: AWSCDKAsyncCustomResource.OnEventRequest) : Promise<AWSCDKAsyncCustomResource.OnEventResponse> => {
     console.info(`Receiving ApprovalRuleAssociationEvent of CodeCommit ${JSON.stringify(event, null, 2)}`);
     var responseData: any;
-    var result = SUCCESS;  
-    var reason: any = '';
     var resourceId: string | undefined = undefined;
     try {
         switch (event.RequestType) {
@@ -168,9 +164,10 @@ export const approvalRuleRepoAssociation: CloudFormationCustomResourceHandler = 
         if (err instanceof Error) {
             console.error(`Failed to associate/disassociate approval rule template with repos due to ${err}.`);
             responseData = err.message;
-            result = FAILED;
-            reason = err.message;
         }
     }
-    return await sendResponse({ Status: result, Reason: reason, PhysicalResourceId: (resourceId ? resourceId : _context.logStreamName), Data: responseData }, event);
+    return {
+      PhysicalResourceId: resourceId,
+      Data: responseData,
+    };
 }

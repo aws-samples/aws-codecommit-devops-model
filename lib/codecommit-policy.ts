@@ -1,19 +1,20 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
-import iam = require('@aws-cdk/aws-iam');
+import * as cdk from 'aws-cdk-lib/core';
+import iam = require('aws-cdk-lib/aws-iam');
+import { Construct } from 'constructs';
 
 export interface CodecommitCollaborationModelProps {
     readonly name: string;
     readonly tags: { [key: string]: string };
 }
 
-export class CodecommitCollaborationModel extends cdk.Construct {
+export class CodecommitCollaborationModel extends Construct {
 
     readonly codeCommitCollaboratorPolicy: iam.ManagedPolicy;
     readonly codeCommitAdminPolicy: iam.ManagedPolicy;
 
-    constructor(scope: cdk.Construct, id: string, props: CodecommitCollaborationModelProps) {
+    constructor(scope: Construct, id: string, props: CodecommitCollaborationModelProps) {
         super(scope, id);
 
         const iamPolicyStatement = new iam.PolicyStatement({
