@@ -1,19 +1,21 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import * as cdk from '@aws-cdk/core';
-import cloudformation = require('@aws-cdk/aws-cloudformation');
-import codecommit = require('@aws-cdk/aws-codecommit');
-import codebuild = require('@aws-cdk/aws-codebuild');
-import events = require('@aws-cdk/aws-events');
-import iam = require('@aws-cdk/aws-iam');
-import lambda = require('@aws-cdk/aws-lambda');
-import lambdaNodejs = require('@aws-cdk/aws-lambda-nodejs');
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import cloudformation = require('aws-cdk-lib/aws-cloudformation');
+import codecommit = require('aws-cdk-lib/aws-codecommit');
+import codebuild = require('aws-cdk-lib/aws-codebuild');
+import events = require('aws-cdk-lib/aws-events');
+import iam = require('aws-cdk-lib/aws-iam');
+import lambda = require('aws-cdk-lib/aws-lambda');
+import lambdaNodejs = require('aws-cdk-lib/aws-lambda-nodejs');
 import path = require('path');
-import targets = require('@aws-cdk/aws-events-targets')
+import targets = require('aws-cdk-lib/aws-events-targets')
+import cr = require('aws-cdk-lib/custom-resources');
 import { CodecommitCollaborationModel } from './codecommit-policy';
 
 export class CodecommitDevopsModelStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
@@ -37,14 +39,14 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       repositoryName: `${stack.stackName}-MyApp1`,
       description: 'Repo for App1.', // optional property
     });
-    bizTags.forEach(tag => { cdk.Tag.add(repo1, tag.name, tag.value )});
+    bizTags.forEach(tag => { cdk.Tags.of(repo1).add(tag.name, tag.value )});
 
     const repo2 = new codecommit.Repository(this, 'Repository2', {
       repositoryName: `${stack.stackName}-MyApp2`,
       description: 'Repo for App2.', // optional property
     });
-    cdk.Tag.add(repo2, 'app', 'my-app-2');
-    cdk.Tag.add(repo2, 'team', 'abc');
+    cdk.Tags.of(repo2).add('app', 'my-app-2');
+    cdk.Tags.of(repo2).add('team', 'abc');
 
     const codeCollaboratorModel = new CodecommitCollaborationModel(this, `CodecommitCollaborationModel`, {
       name: 'MyApp1',
@@ -132,7 +134,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       ),
       timeout: cdk.Duration.minutes(30),
     });
-    bizTags.forEach(tag => { cdk.Tag.add(prBuild, tag.name, tag.value )});
+    bizTags.forEach(tag => { cdk.Tags.of(prBuild).add(tag.name, tag.value )});
 
     // create lambda to listen on the state changed of PR Build
     const codecommitPolicy = new iam.PolicyStatement({
@@ -251,7 +253,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
           resource: 'stack',
           region: '*',
           resourceName: `CDKToolkit/*`,
-          sep: '/',
+          arnFormat: cdk.ArnFormat.SLASH_RESOURCE_NAME,
         }, stack),
       ],
     });
@@ -271,7 +273,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
           service: 'cloudformation',
           resource: 'stack',
           resourceName: `${stackName}/*`,
-          sep: '/',
+          arnFormat: cdk.ArnFormat.SLASH_RESOURCE_NAME,
         }, stack),
       ],
     });
@@ -347,7 +349,7 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       branches: ['master'],
       target: new targets.CodeBuildProject(deploymentBuild),
     });
-    bizTags.forEach(tag => { cdk.Tag.add(deploymentBuild, tag.name, tag.value )});
+    bizTags.forEach(tag => { cdk.Tags.of(deploymentBuild).add(tag.name, tag.value )});
     
     // create lambda based custom resource to create approval rule template
     const codecommitApprovalRulePolicy = new iam.PolicyStatement({
@@ -390,8 +392,11 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       },
     });
 
-    const approvalRuleTemplaate = new cloudformation.CustomResource(this, 'CustomResource-CodeCommit-ApprovalRuleTemplate', {
-      provider: cloudformation.CustomResourceProvider.lambda(approvalRuleTemplateProvider),
+    const ruleTemplateProvider = new cr.Provider(this, 'CodeCommitApprovalRuleTemplateProvider', {
+      onEventHandler: approvalRuleTemplateProvider,
+    });
+    const approvalRuleTemplaate = new cdk.CustomResource(this, 'CustomResource-CodeCommit-ApprovalRuleTemplate', {
+      serviceToken: ruleTemplateProvider.serviceToken,
       resourceType: 'Custom::CodeCommitApprovalRuleTemplate',
       properties: {
         ApprovalRuleTemplateName: `approval-rule-template-${repo1.repositoryName}`,
@@ -406,14 +411,14 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
                 region: '',
                 resource: 'assumed-role',
                 resourceName: `${repo1AdminRole.roleName}/*`,
-                sep: '/'
+                arnFormat: cdk.ArnFormat.SLASH_RESOURCE_NAME,
               }, stack),
               cdk.Arn.format({
                 service: 'sts',
                 region: '',
                 resource: 'assumed-role',
                 resourceName: `${prBuildEventLambaRole.roleName}/*`,
-                sep: '/'
+                arnFormat: cdk.ArnFormat.SLASH_RESOURCE_NAME,
               }, stack)
             ]
           }
@@ -434,8 +439,11 @@ export class CodecommitDevopsModelStack extends cdk.Stack {
       },
     });
 
-    new cloudformation.CustomResource(this, 'CustomResource-CodeCommit-ApprovalRuleTemplate-Repos-Association', {
-      provider: cloudformation.CustomResourceProvider.lambda(approvalRuleTemplateRepoAssociationProvider),
+    const ruleTemplateReposProvider = new cr.Provider(this, 'CodeCommitApprovalRuleTemplateReposProvider', {
+      onEventHandler: approvalRuleTemplateRepoAssociationProvider,
+    });
+    new cdk.CustomResource(this, 'CustomResource-CodeCommit-ApprovalRuleTemplate-Repos-Association', {
+      serviceToken: ruleTemplateReposProvider.serviceToken,
       resourceType: 'Custom::CodeCommitApprovalRuleTemplateReposAssociation',
       properties: {
         ApprovalRuleTemplateName: approvalRuleTemplaate.getAttString('approvalRuleTemplateName'),

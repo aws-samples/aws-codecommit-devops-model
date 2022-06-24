@@ -15,31 +15,31 @@
     "cleanup": "npx cdk destroy"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.150.0",
-    "@types/aws-lambda": "^8.10.93",
+    "aws-cdk-lib": "2.0.0",
+    "constructs": "10.0.5",
+    "aws-cdk": "^2.0.0",
+    "@types/aws-lambda": "^8.10.101",
     "@types/deep-equal": "^1.0.1",
     "@types/jest": "^26.0.24",
     "@types/node": "14.14.16",
-    "aws-cdk": "1.150.0",
-    "jest": "^26.6.3",
+    "jest": "^27",
+    "jest-junit": "^13",
     "lodash": "^4.17.21",
     "node-notifier": "^10.0.1",
     "set-value": ">=4.0.1",
-    "ts-jest": "^26.5.6",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.6.3"
+    "ts-jest": "^27",
+    "ts-node": "^9",
+    "typescript": "~4.6.0"
   },
   "dependencies": {
-    "@aws-cdk/aws-codebuild": "^1.150.0",
-    "@aws-cdk/aws-codecommit": "^1.150.0",
-    "@aws-cdk/aws-events-targets": "^1.150.0",
-    "@aws-cdk/aws-iam": "^1.150.0",
-    "@aws-cdk/aws-lambda-nodejs": "^1.150.0",
-    "@aws-cdk/core": "1.150.0",
-    "aws-sdk": "^2.1102.0",
+    "aws-sdk": "^2.1161.0",
     "cfn-custom-resource": "^5.0.14",
     "deep-equal": "^2.0.5",
     "source-map-support": "^0.5.21"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "^2.0.0",
+    "constructs": "^10.0.5"
   },
   "license": "MIT-0"
 }
