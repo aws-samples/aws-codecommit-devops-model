@@ -1,5 +1,7 @@
 # AWS CodeCommit based devops model
 
+**The mechanism described in the companion blog still works, but the sample code in this repo is no longer maintained. It is recommended that you use [Amazon CodeCatalyst](https://docs.aws.amazon.com/codecatalyst/latest/userguide/test-workflow-actions.html) to simplify the configuration and archive the same workflow.**
+
 [简体中文版本](README.zh-CN.md)
 
 > Now this best practice model works on both AWS Global and [AWS China regions][codecommit-china-ga-news]. 
